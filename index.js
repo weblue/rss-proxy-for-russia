@@ -5,7 +5,12 @@ import moment from "moment";
 const app = express()
 const port = 3000
 
-const rss_list = ["http://feeds.bbci.co.uk/russian/rss.xml"]
+const rss_list = {
+    bbc_ru: "http://feeds.bbci.co.uk/russian/rss.xml",
+    bbc: "http://feeds.bbci.co.uk/news/world-60525350/rss.xml",
+    ap: "https://www.pipes.digital/feed/1NjYgr9z", // AP World News
+    reuters: "https://www.pipes.digital/feed/1NklLJOR" // Reuters Ukraine
+}
 
 const cache = {
     data: "",
@@ -20,11 +25,12 @@ app.get('/rss_feed', async (req, res) => {
         let originalFeed;
 
         try {
+            let source = req.query.source || 'ap';
             originalFeed = await new Parser({
                 customFields: {
                     feed: ["image", "managingEditor", "copyright", "language"]
                 }
-            }).parseURL(rss_list[0]);
+            }).parseURL(rss_list[source]);
             //TODO combine all these rss files and serve as one?
         } catch (err) {
             return res.status(400).send('Error: Cannot parse feed.');
@@ -34,7 +40,10 @@ app.get('/rss_feed', async (req, res) => {
         let newFeed;
 
         // Return cached element if available, probably just do this in memory instead of with redis
-        if(cache.expires.isAfter(moment())) {
+        newFeed = new RSS(transformFeed(originalFeed))
+
+        // TODO make separate caches for each language
+        /*if(cache.expires.isAfter(moment())) {
             newFeed = cache.data;
         } else {
             newFeed = new RSS(transformFeed(originalFeed))
@@ -43,7 +52,7 @@ app.get('/rss_feed', async (req, res) => {
             cache.data = newFeed;
             cache.expires = moment().add(15, 'm');
             console.log("Cache expired, updating...")
-        }
+        }*/
 
         // Transform and add all items to the feed
         const transformedItems = await transformItems(originalFeed.items);
@@ -68,7 +77,8 @@ function transformFeed(originalFeed) {
         image_url: originalFeed.image ? originalFeed.image.url : undefined,
         managingEditor: originalFeed.managingEditor,
         copyright: originalFeed.copyright,
-        language: originalFeed.language
+        language: originalFeed.language,
+        content: originalFeed.content
     }
 }
 
@@ -87,7 +97,8 @@ async function transformItem(inputItem) {
         guid: inputItem.guid,
         categories: inputItem.categories,
         author: inputItem.creator,
-        date: inputItem.pubDate
+        date: inputItem.pubDate,
+        content: inputItem.content
     }
     // TODO maybe cache this result after we mess with the description
 
