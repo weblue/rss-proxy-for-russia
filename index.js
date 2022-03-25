@@ -9,16 +9,13 @@ import request from 'request-promise';
 const port = 3000
 
 const rss_list = {
-    bbc_ru: { url: "http://feeds.bbci.co.uk/russian/rss.xml", selector: "main > div p" }
-    bbc: { url: "http://feeds.bbci.co.uk/news/world-60525350/rss.xml", selector: "main > div p" }
-    ap: { url: "https://www.pipes.digital/feed/1NjYgr9z", selector: ""}// AP World News
-    reuters: { url: "https://www.pipes.digital/feed/1NklLJOR", selector: ""} // Reuters Ukraine
+    bbc_ru: { url: 'http://feeds.bbci.co.uk/russian/rss.xml', selector: "main > div p" },
+    bbc: { url: 'http://feeds.bbci.co.uk/news/world-60525350/rss.xml', selector: "main > div p" },
+    ap: { url: 'https://www.pipes.digital/feed/1NjYgr9z', selector: ""},// AP World News
+    reuters: { url: 'https://www.pipes.digital/feed/1NklLJOR', selector: ""} // Reuters Ukraine
 }
 
-const cache = {
-    data: "",
-    expires: moment()
-}
+const cache = { }
 
 app.use(express.static('dist'))
 
@@ -26,9 +23,9 @@ app.get('/rss_feed', async (req, res) => {
     try {
         // Get the original feed
         let originalFeed;
+        let source = req.query.source || 'ap';
 
         try {
-            let source = req.query.source || 'ap';
             originalFeed = await new Parser({
                 customFields: {
                     feed: ["image", "managingEditor", "copyright", "language"]
@@ -46,16 +43,19 @@ app.get('/rss_feed', async (req, res) => {
         newFeed = new RSS(transformFeed(originalFeed))
 
         // TODO make separate caches for each language
-        /*if(cache.expires.isAfter(moment())) {
-            newFeed = cache.data;
+        if(cache[rss_list[source].url] 
+            && cache[rss_list[source].url].expires
+            && cache[rss_list[source].url].data
+            && cache[rss_list[source].url].expires.isAfter(moment())) {
+            newFeed = cache[rss_list[source].url].data;
+            console.log(`Positive hit on cache, serving old data for ${source}...`)
         } else {
             newFeed = new RSS(transformFeed(originalFeed))
 
             // Cache result
-            cache.data = newFeed;
-            cache.expires = moment().add(15, 'm');
-            console.log("Cache expired, updating...")
-        }*/
+            cache[rss_list[source].url] = { data: newFeed, expires: moment().add(15, 'm') };
+            console.log(`Cache expired for ${source}, updating...`)
+        }
 
         // Transform and add all items to the feed
         const transformedItems = await transformItems(originalFeed.items);
