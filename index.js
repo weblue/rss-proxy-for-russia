@@ -31,7 +31,6 @@ app.get('/rss_feed', async (req, res) => {
                     feed: ["image", "managingEditor", "copyright", "language"]
                 }
             }).parseURL(rss_list[source].url);
-            //TODO combine all these rss files and serve as one?
         } catch (err) {
             return res.status(400).send('Error: Cannot parse feed.');
         }
@@ -39,10 +38,7 @@ app.get('/rss_feed', async (req, res) => {
         // Create the new feed from the original one
         let newFeed;
 
-        // Return cached element if available, probably just do this in memory instead of with redis
-        newFeed = new RSS(transformFeed(originalFeed))
-
-        // TODO make separate caches for each language
+        // Return cached element if available
         if(cache[rss_list[source].url] 
             && cache[rss_list[source].url].expires
             && cache[rss_list[source].url].data
@@ -52,16 +48,16 @@ app.get('/rss_feed', async (req, res) => {
         } else {
             newFeed = new RSS(transformFeed(originalFeed))
 
-            // Cache result
-            cache[rss_list[source].url] = { data: newFeed, expires: moment().add(15, 'm') };
-            console.log(`Cache expired for ${source}, updating...`)
-        }
+            // Transform and add all items to the feed
+            const transformedItems = await transformItems(originalFeed.items, rss_list[source].selector);
+            transformedItems.forEach((item) => {
+                newFeed.item(item);
+            })
 
-        // Transform and add all items to the feed
-        const transformedItems = await transformItems(originalFeed.items);
-        transformedItems.forEach((item) => {
-            newFeed.item(item);
-        })
+            // Cache result
+            console.log(`Cache expired for ${source}, updating...`)
+            cache[rss_list[source].url] = { data: newFeed, expires: moment().add(15, 'm') };
+        }
 
         // Send the feed as response
         res.set('Content-Type', 'text/xml');
@@ -85,17 +81,17 @@ function transformFeed(originalFeed) {
     }
 }
 
-async function transformItems(input) {
-    return await Promise.all(input.map(async (inputItem) => await transformItem(inputItem)));
+async function transformItems(input, selector) {
+    return await Promise.all(input.map(async (inputItem) => await transformItem(inputItem, selector)));
 }
 
-async function transformItem(inputItem) {
+async function transformItem(inputItem, selector) {
     // Selecting identifier
     const identifier = inputItem.guid || inputItem.link || inputItem.title;
 
     const result = {
         title: inputItem.title,
-        description: await parseContent(inputItem.link, ["main > div.bbc-19j92fr"]),
+        description: await parseContent(inputItem.link, selector),
         url: inputItem.link,
         guid: inputItem.guid,
         categories: inputItem.categories,
@@ -110,7 +106,7 @@ async function transformItem(inputItem) {
 
 //Modify this to produce meaningful content to populate description.
 //This could be the solution to proxying content
-async function parseContent(url, selectors) {
+async function parseContent(url, selector) {
     // Load HTML
     const html = await request(url);
 
@@ -118,11 +114,7 @@ async function parseContent(url, selectors) {
     const $ = cheerio.load(html);
 
     // Gather output html
-    let output = '';
-    for (let selector of selectors) {
-        output += $(selector).text();
-    }
-
+    let output = $(selector).text();
     return output;
 }
 
