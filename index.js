@@ -2,14 +2,17 @@ import Parser from "rss-parser";
 import express from 'express';
 import RSS from "rss";
 import moment from "moment";
+import cheerio from 'cheerio';
 const app = express()
+import request from 'request-promise';
+
 const port = 3000
 
 const rss_list = {
-    bbc_ru: "http://feeds.bbci.co.uk/russian/rss.xml",
-    bbc: "http://feeds.bbci.co.uk/news/world-60525350/rss.xml",
-    ap: "https://www.pipes.digital/feed/1NjYgr9z", // AP World News
-    reuters: "https://www.pipes.digital/feed/1NklLJOR" // Reuters Ukraine
+    bbc_ru: { url: "http://feeds.bbci.co.uk/russian/rss.xml", selector: "main > div p" }
+    bbc: { url: "http://feeds.bbci.co.uk/news/world-60525350/rss.xml", selector: "main > div p" }
+    ap: { url: "https://www.pipes.digital/feed/1NjYgr9z", selector: ""}// AP World News
+    reuters: { url: "https://www.pipes.digital/feed/1NklLJOR", selector: ""} // Reuters Ukraine
 }
 
 const cache = {
@@ -30,7 +33,7 @@ app.get('/rss_feed', async (req, res) => {
                 customFields: {
                     feed: ["image", "managingEditor", "copyright", "language"]
                 }
-            }).parseURL(rss_list[source]);
+            }).parseURL(rss_list[source].url);
             //TODO combine all these rss files and serve as one?
         } catch (err) {
             return res.status(400).send('Error: Cannot parse feed.');
@@ -92,7 +95,7 @@ async function transformItem(inputItem) {
 
     const result = {
         title: inputItem.title,
-        description: inputItem.description, //await parseContent(inputItem.link, selectors),
+        description: await parseContent(inputItem.link, ["main > div.bbc-19j92fr"]),
         url: inputItem.link,
         guid: inputItem.guid,
         categories: inputItem.categories,
@@ -105,7 +108,6 @@ async function transformItem(inputItem) {
     return result;
 }
 
-//TODO maybe use this? it reads the web page and does stuff with it
 //Modify this to produce meaningful content to populate description.
 //This could be the solution to proxying content
 async function parseContent(url, selectors) {
@@ -118,7 +120,7 @@ async function parseContent(url, selectors) {
     // Gather output html
     let output = '';
     for (let selector of selectors) {
-        output += $(selector);
+        output += $(selector).text();
     }
 
     return output;
