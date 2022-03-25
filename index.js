@@ -11,8 +11,8 @@ const port = 3000
 const rss_list = {
     bbc_ru: { url: 'http://feeds.bbci.co.uk/russian/rss.xml', selector: "main > div p" },
     bbc: { url: 'http://feeds.bbci.co.uk/news/world-60525350/rss.xml', selector: "main > div p" },
-    ap: { url: 'https://www.pipes.digital/feed/1NjYgr9z', selector: ""},// AP World News
-    reuters: { url: 'https://www.pipes.digital/feed/1NklLJOR', selector: ""} // Reuters Ukraine
+    ap: { url: 'https://www.pipes.digital/feed/1NjYgr9z', selector: ".Article > p"},
+    reuters: { url: 'https://www.pipes.digital/feed/1NklLJOR', selector: ".article-body__content__3VtU3 > p"}
 }
 
 const cache = { }
@@ -39,7 +39,7 @@ app.get('/rss_feed', async (req, res) => {
         let newFeed;
 
         // Return cached element if available
-        if(cache[rss_list[source].url] 
+        if(cache[rss_list[source].url]
             && cache[rss_list[source].url].expires
             && cache[rss_list[source].url].data
             && cache[rss_list[source].url].expires.isAfter(moment())) {
@@ -76,8 +76,7 @@ function transformFeed(originalFeed) {
         image_url: originalFeed.image ? originalFeed.image.url : undefined,
         managingEditor: originalFeed.managingEditor,
         copyright: originalFeed.copyright,
-        language: originalFeed.language,
-        content: originalFeed.content
+        language: originalFeed.language
     }
 }
 
@@ -96,8 +95,7 @@ async function transformItem(inputItem, selector) {
         guid: inputItem.guid,
         categories: inputItem.categories,
         author: inputItem.creator,
-        date: inputItem.pubDate,
-        content: inputItem.content
+        date: inputItem.pubDate
     }
     // TODO maybe cache this result after we mess with the description
 
