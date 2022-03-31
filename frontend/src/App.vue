@@ -149,6 +149,7 @@ export default {
           .replace(/U.N./g, "UN")
           .replace(/U.K./g, "UK")
           .replace(/D.C./g, "DC")
+          .replace(/E.U./g, "EU")
           .split(/(?<=[a-z])(?=[B{2}C])|(?<=[.?!])(?=[A-Z])/)
           .map(p => {
             if (p.charAt(p.length - 1) !== '.' && p.charAt(p.length - 1) !== '?' && p.charAt(p.length - 1) !== '!' && p.charAt(p.length - 1) !== '"') {
