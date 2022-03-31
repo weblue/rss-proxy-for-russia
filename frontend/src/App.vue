@@ -104,7 +104,6 @@ export default {
           .get('/rss_feed?source=' + source)
           .then((response) => {
             xml2js.parseStringPromise(response.data /*, options */).then((result) => {
-              console.log(result.rss.channel[0])
               result.rss.channel[0].item.forEach(el => {
                 // prevent duplicates
                 if (!this.articles.find(x => x.link === el.link[0])) {
@@ -122,7 +121,6 @@ export default {
               // sort by date
               this.articles.sort((a, b) => b.date - a.date);
               this.loading = false;
-              console.log(this.articles);
             })
                 .catch((err) => {
                   console.log(err);
