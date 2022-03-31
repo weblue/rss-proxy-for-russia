@@ -1,6 +1,6 @@
 <template>
   <footer class="footer has-background-grey-dark has-text-light p-3">
-    <p>{{ lang === 'en' ? 'World News Aggregator' : 'агрегатор мировых новостей' }}</p>
+    <p>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</p>
   </footer>
 </template>
 

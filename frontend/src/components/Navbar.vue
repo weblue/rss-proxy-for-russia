@@ -8,7 +8,7 @@
         >
       </b-navbar-item>
       <b-navbar-item >
-        <strong>{{ lang === 'en' ? 'World News Aggregator' : 'агрегатор мировых новостей' }}</strong>
+        <strong>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</strong>
       </b-navbar-item>
     </template>
 
