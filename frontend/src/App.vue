@@ -146,6 +146,7 @@ export default {
     parseContent(content) {
       return content
           .replace(/U.S./g, "US")
+          .replace(/U.N./g, "UN")
           .replace(/D.C./g, "DC")
           .split(/(?<=[a-z])(?=[B{2}C])|(?<=[.?!])(?=[A-Z])/)
           .map(p => {
