@@ -8,35 +8,50 @@
             class="is-info"
             :aria-close-label="lang === 'en'? 'Close message' : 'закрыть'">
           <div v-if="lang === 'en'">
+            <p>Welcome to the World News Aggregator, a single source that compiles unabridged, up-to-date articles about
+              world news from the BBC, AP, and Reuters in one place.</p>
             <p>This site will always be accessible, but if you want to access other websites blocked by the government,
-            you can follow these instructions to set up a free VPN (Virtual Private Network).</p>
+              you can follow these instructions to set up a free VPN (Virtual Private Network).</p>
             <ol>
-              <li>Sign up for a <a href="https://account.protonvpn.com/signup" target="_blank">Proton VPN</a> account.</li>
-              <li>Download and install the app that matches your device type.</li>
-              <li>Open the app and Quick Connect to any server outside the country.</li>
+              <li>Download and install the <a href="https://psiphon.ca/en/download.html?psiphonca" target="_blank">
+                Psiphon app</a> that matches your device type.
+              </li>
+              <li>Open the app and Connect.</li>
+              <li>You can change the server region by opening settings (the gear icon) and changing the "Select server
+                region" setting.
+              </li>
               <li>You are now free to browse sites unrestricted.</li>
             </ol>
           </div>
           <div v-if="lang === 'ru'">
-            <p>Этот сайт всегда будет доступен, но если вы хотите получить доступ к другим веб-сайтам, заблокированным правительством, вы можете следовать этим инструкциям, чтобы настроить бесплатную VPN (виртуальную частную сеть).</p>
+            <p>Добро пожаловать в Агрегатор мировых новостей, единый источник, который собирает полные и актуальные
+              статьи о мировых новостях от BBC, AP и Reuters в одном месте.</p>
+            <p>Этот сайт всегда будет доступен, но если вы хотите получить доступ к другим веб-сайтам, заблокированным
+              правительством, вы можете следовать этим инструкциям, чтобы настроить бесплатную VPN (виртуальную частную
+              сеть).</p>
             <ol>
-              <li>Зарегистрируйте учетную запись <a href="https://account.protonvpn.com/signup" target="_blank">Proton VPN</a></li>
-              <li>Загрузите и установите приложение, соответствующее типу вашего устройства.</li>
-              <li>Откройте приложение и быстро подключитесь к любому серверу за пределами страны.</li>
+              <li>Загрузите и установите <a href="https://psiphon.ca/en/download.html?psiphonca" target="_blank">
+                приложение Psiphon</a>, соответствующее типу вашего устройства.
+              </li>
+              <li>Откройте приложение и подключитесь.</li>
+              <li>Вы можете изменить регион сервера, открыв настройки (значок шестеренки) и изменив настройку «Выберите
+                регион сервера».
+              </li>
               <li>Теперь вы можете свободно просматривать веб-сайты без ограничений.</li>
             </ol>
+            <p>Для получения более подробных инструкций посетите <a href="https://www.currenttime.tv/block" target="_blank">здесь</a>.</p>
           </div>
         </b-message>
         <Article
-          v-for="(a, i) in articles"
-          :key="'article-'+i"
-          :title="a.title"
-          :link="a.link"
-          :content="a.content"
-          :source="a.source"
-          :timestamp="a.date"
-          :loading="loading"
-          :lang="lang"
+            v-for="(a, i) in articles"
+            :key="'article-'+i"
+            :title="a.title"
+            :link="a.link"
+            :content="a.content"
+            :source="a.source"
+            :timestamp="a.date"
+            :loading="loading"
+            :lang="lang"
         />
       </div>
     </main>
@@ -67,26 +82,26 @@ export default {
     }
   },
   mounted() {
-    if(localStorage.getItem('lang')){
+    if (localStorage.getItem('lang')) {
       this.lang = localStorage.getItem('lang')
     }
     this.loadArticles();
   },
   methods: {
-    loadArticles(){
+    loadArticles() {
       this.articles = new Array(20).fill(-1); // placeholder elements for the card skeleton
       this.loading = true;
-      if(this.lang === 'en'){
-        for(let i = 0; i < this.eng_sources.length; i++){
+      if (this.lang === 'en') {
+        for (let i = 0; i < this.eng_sources.length; i++) {
           this.makeApiCall(this.eng_sources[i])
         }
-      } else if (this.lang === 'ru'){
+      } else if (this.lang === 'ru') {
         this.makeApiCall('bbc_ru')
       }
     },
     async makeApiCall(source) {
       axios
-          .get('/rss_feed?source='+source)
+          .get('/rss_feed?source=' + source)
           .then((response) => {
             xml2js.parseStringPromise(response.data /*, options */).then((result) => {
               console.log(result.rss.channel[0])
@@ -130,7 +145,7 @@ export default {
       }
       this.loadArticles();
     },
-    parseContent(content){
+    parseContent(content) {
       return content
           .replace(/U.S./g, "US")
           .replace(/D.C./g, "DC")
@@ -141,7 +156,7 @@ export default {
             } else {
               return p
             }
-      })
+          })
     }
   }
 }
