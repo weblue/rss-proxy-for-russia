@@ -7,10 +7,25 @@
             :title="lang === 'en'? 'Welcome!' : 'Добро пожаловать! '"
             class="is-info"
             :aria-close-label="lang === 'en'? 'Close message' : 'закрыть'">
-          <p v-if="lang === 'en'">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce id fermentum quam.
-            Proin sagittis, nibh id
-            hendrerit imperdiet, elit sapien laoreet elit</p>
-          <p v-if="lang === 'ru'">Put russian welcome message here</p>
+          <div v-if="lang === 'en'">
+            <p>This site will always be accessible, but if you want to access other websites blocked by the government,
+            you can follow these instructions to set up a free VPN (Virtual Private Network).</p>
+            <ol>
+              <li>Sign up for a <a href="https://account.protonvpn.com/signup" target="_blank">Proton VPN</a> account.</li>
+              <li>Download and install the app that matches your device type.</li>
+              <li>Open the app and Quick Connect to any server outside the country.</li>
+              <li>You are now free to browse sites unrestricted.</li>
+            </ol>
+          </div>
+          <div v-if="lang === 'ru'">
+            <p>Этот сайт всегда будет доступен, но если вы хотите получить доступ к другим веб-сайтам, заблокированным правительством, вы можете следовать этим инструкциям, чтобы настроить бесплатную VPN (виртуальную частную сеть).</p>
+            <ol>
+              <li>Зарегистрируйте учетную запись <a href="https://account.protonvpn.com/signup" target="_blank">Proton VPN</a></li>
+              <li>Загрузите и установите приложение, соответствующее типу вашего устройства.</li>
+              <li>Откройте приложение и быстро подключитесь к любому серверу за пределами страны.</li>
+              <li>Теперь вы можете свободно просматривать веб-сайты без ограничений.</li>
+            </ol>
+          </div>
         </b-message>
         <Article
           v-for="(a, i) in articles"
