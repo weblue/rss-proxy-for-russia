@@ -3,7 +3,8 @@
       class="card mb-4"
       animation="slide"
       aria-id="contentIdForA11y3"
-      :open="open">
+      :open="open"
+      @open="$emit('switch-open', index)">
     <template #trigger="props" >
       <div
           class="card-header"
@@ -82,6 +83,9 @@ export default {
     open: {
       type: Boolean,
       default: false
+    },
+    index: {
+      type: Number
     }
   }
 }

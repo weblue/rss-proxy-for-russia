@@ -54,6 +54,9 @@
             :timestamp="a.date"
             :loading="loading"
             :lang="lang"
+            :open="openCards[i] === 'open'"
+            :index="i"
+            @switch-open="switchOpen"
         />
       </div>
     </main>
@@ -78,9 +81,11 @@ export default {
   data() {
     return {
       loading: true,
-      articles: new Array(20).fill(-1),
+      skeleton_length: 20,
+      articles: new Array(this.skeleton_length).fill(-1),
       lang: 'en',
-      eng_sources: ['ap', 'bbc', 'reuters']
+      eng_sources: ['ap', 'bbc', 'reuters'],
+      openCards: new Array(this.skeleton_length).fill('closed')
     }
   },
   mounted() {
@@ -91,7 +96,8 @@ export default {
   },
   methods: {
     loadArticles() {
-      this.articles = new Array(20).fill(-1); // placeholder elements for the card skeleton
+      this.articles = new Array(this.skeleton_length).fill(-1); // placeholder elements for the card skeleton
+      this.openCards = new Array(this.skeleton_length).fill('closed');
       this.loading = true;
       if (this.lang === 'en') {
         for (let i = 0; i < this.eng_sources.length; i++) {
@@ -122,6 +128,7 @@ export default {
               this.articles = this.articles.filter(x => x !== -1);
               // sort by date
               this.articles.sort((a, b) => b.date - a.date);
+              this.openCards = new Array(this.articles.length).fill('closed');
               this.loading = false;
             })
                 .catch((err) => {
@@ -144,6 +151,13 @@ export default {
         localStorage.setItem("lang", "en")
       }
       this.loadArticles();
+    },
+    switchOpen(index){
+      if(this.openCards[index] === 'open'){
+        this.$set(this.openCards, index, 'closed');
+      }else{
+        this.$set(this.openCards, index, 'open');
+      }
     },
     parseContent(content) {
       return content
