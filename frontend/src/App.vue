@@ -126,10 +126,9 @@ export default {
                 }
               });
               // remove placeholder items
-              this.articles = this.articles.filter(x => x !== -1);
+              this.articles = this.articles.filter(a => a !== -1 && a.content.length > 0);
               // sort by date
               this.articles.sort((a, b) => b.date - a.date);
-              console.log(this.articles);
               this.openCards = new Array(this.articles.length).fill('closed');
               this.loading = false;
             })
@@ -162,17 +161,27 @@ export default {
       }
     },
     parseContent(content) {
-      let parsed = content
-          .replace(/U.S./g, "US")
-          .replace(/U.N./g, "UN")
-          .replace(/U.K./g, "UK")
-          .replace(/D.C./g, "DC")
-          .replace(/E.U./g, "EU")
-          .replace(/W.H.K./g, "WHK")
-          .replace(/H.K./g, "HK")
-          .replace(/B.B.C./g, "BBC")
-          .split(/[<].*?[>]/);
-      return parsed.filter(p => !p.includes("read more") && p.length > 0 && p !== p.toUpperCase())
+      // remove tags from plain html
+      let parsed = content.split(/[<].*?[>]/);
+      // remove external and video links
+      parsed = parsed.filter(p => !p.toLowerCase().includes("read more") && !p.includes("Warning: ") && p.length > 0 && p !== p.toUpperCase());
+      // find end of article/ start of side links/ads
+      let qInd = parsed.findIndex(p => p.toLowerCase().includes("send us your questions"));
+      if(qInd > -1) parsed.splice(qInd, parsed.length-1);
+      let wInd = parsed.findIndex(p => p.includes("WATCH: "));
+      if(wInd > -1) parsed.splice(wInd, parsed.length-1);
+      // combine incomplete sentences
+      let deleteThese = [];
+      let lastChanged = 0;
+      parsed.forEach((p,i) => {
+        if(p.charAt(p.length-1) !== '.' && p.charAt(p.length-1) !== '"' && p.charAt(p.length-1) !== '?' && p.charAt(p.length-1) !== '!'){
+          if(!deleteThese.includes(i)) lastChanged = i;
+          parsed[lastChanged] = parsed[lastChanged].concat(parsed[i+1]);
+          deleteThese.push(i+1);
+        }
+      });
+      parsed = parsed.filter((p,i) => !deleteThese.includes(i))
+      return parsed;
     }
   }
 }
