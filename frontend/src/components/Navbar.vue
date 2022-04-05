@@ -1,18 +1,17 @@
 <template>
-  <b-navbar>
+  <b-navbar :mobile-burger="false">
     <template #brand>
       <b-navbar-item>
-        <img
-            src="../assets/ru-rss.png"
-            alt="World News Aggregator Logo"
-        >
+        <b-navbar-item>
+          <img
+              src="../assets/ru-rss.png"
+              alt="World News Aggregator Logo"
+          >
+        </b-navbar-item>
+        <b-navbar-item >
+          <strong>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</strong>
+        </b-navbar-item>
       </b-navbar-item>
-      <b-navbar-item >
-        <strong>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</strong>
-      </b-navbar-item>
-    </template>
-
-    <template #end>
       <b-navbar-item tag="div">
         <div class="buttons">
           <a class="button is-primary" @click="switchLang">

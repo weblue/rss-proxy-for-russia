@@ -153,10 +153,10 @@ export default {
       }
       this.loadArticles();
     },
-    switchOpen(index){
-      if(this.openCards[index] === 'open'){
+    switchOpen(index) {
+      if (this.openCards[index] === 'open') {
         this.$set(this.openCards, index, 'closed');
-      }else{
+      } else {
         this.$set(this.openCards, index, 'open');
       }
     },
@@ -167,20 +167,20 @@ export default {
       parsed = parsed.filter(p => !p.toLowerCase().includes("read more") && !p.includes("Warning: ") && p.length > 0 && p !== p.toUpperCase());
       // find end of article/ start of side links/ads
       let qInd = parsed.findIndex(p => p.toLowerCase().includes("send us your questions"));
-      if(qInd > -1) parsed.splice(qInd, parsed.length-1);
+      if (qInd > -1) parsed.splice(qInd, parsed.length - 1);
       let wInd = parsed.findIndex(p => p.includes("WATCH: "));
-      if(wInd > -1) parsed.splice(wInd, parsed.length-1);
+      if (wInd > -1) parsed.splice(wInd, parsed.length - 1);
       // combine incomplete sentences
       let deleteThese = [];
       let lastChanged = 0;
-      parsed.forEach((p,i) => {
-        if(p.charAt(p.length-1) !== '.' && p.charAt(p.length-1) !== '"' && p.charAt(p.length-1) !== '?' && p.charAt(p.length-1) !== '!'){
-          if(!deleteThese.includes(i)) lastChanged = i;
-          parsed[lastChanged] = parsed[lastChanged].concat(parsed[i+1]);
-          deleteThese.push(i+1);
+      parsed.forEach((p, i) => {
+        if (p.charAt(p.length - 1) !== '.' && p.charAt(p.length - 1) !== '"' && p.charAt(p.length - 1) !== '?' && p.charAt(p.length - 1) !== '!') {
+          if (!deleteThese.includes(i)) lastChanged = i;
+          parsed[lastChanged] = parsed[lastChanged].concat(parsed[i + 1]);
+          deleteThese.push(i + 1);
         }
       });
-      parsed = parsed.filter((p,i) => !deleteThese.includes(i))
+      parsed = parsed.filter((p, i) => !deleteThese.includes(i))
       return parsed;
     }
   }
@@ -241,5 +241,18 @@ a:hover {
 .svg-inline--fa {
   height: 1.25em;
   width: 1.25em;
+}
+
+.navbar-brand {
+  justify-content: space-between !important;
+}
+
+.navbar-item {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+.navbar-brand {
+  width: 100% !important;
 }
 </style>
