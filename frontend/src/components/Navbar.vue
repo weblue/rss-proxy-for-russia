@@ -8,8 +8,9 @@
               alt="World News Aggregator Logo"
           >
         </b-navbar-item>
-        <b-navbar-item >
-          <strong>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</strong>
+        <b-navbar-item v-bind:class="{'p-0': isMobile}">
+          <strong v-if="isMobile">WNA</strong>
+          <strong v-else>{{ lang === 'en' ? 'World News Aggregator' : 'Агрегатор мировых новостей' }}</strong>
         </b-navbar-item>
       </b-navbar-item>
       <b-navbar-item tag="div">
@@ -30,6 +31,11 @@ export default {
     lang: {
       type: String,
       default: 'en'
+    }
+  },
+  data(){
+    return{
+      isMobile: window.innerWidth < 768
     }
   },
   methods: {
