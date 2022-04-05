@@ -114,10 +114,11 @@ export default {
             xml2js.parseStringPromise(response.data /*, options */).then((result) => {
               result.rss.channel[0].item.forEach(el => {
                 // prevent duplicates
-                if (!this.articles.find(x => x.link === el.link[0])) {
+                if (!this.articles.find(x => x.link === el.link[0]) && el.description) {
                   this.articles.unshift({
                     title: el.title[0],
-                    content: el.description ? this.parseContent(el.description[0]) : '',
+                    description: el.description[0],
+                    content: this.parseContent(el.description[0]),
                     date: new Date(el.pubDate[0]),
                     link: el.link[0],
                     source: result.rss.channel[0].title[0]
@@ -128,6 +129,7 @@ export default {
               this.articles = this.articles.filter(x => x !== -1);
               // sort by date
               this.articles.sort((a, b) => b.date - a.date);
+              console.log(this.articles);
               this.openCards = new Array(this.articles.length).fill('closed');
               this.loading = false;
             })
@@ -160,20 +162,17 @@ export default {
       }
     },
     parseContent(content) {
-      return content
+      let parsed = content
           .replace(/U.S./g, "US")
           .replace(/U.N./g, "UN")
           .replace(/U.K./g, "UK")
           .replace(/D.C./g, "DC")
           .replace(/E.U./g, "EU")
-          .split(/(?<=[a-z])(?=[B{2}C])|(?<=[.?!])(?=[A-Z])/)
-          .map(p => {
-            if (p.charAt(p.length - 1) !== '.' && p.charAt(p.length - 1) !== '?' && p.charAt(p.length - 1) !== '!' && p.charAt(p.length - 1) !== '"') {
-              return p + '.'
-            } else {
-              return p
-            }
-          })
+          .replace(/W.H.K./g, "WHK")
+          .replace(/H.K./g, "HK")
+          .replace(/B.B.C./g, "BBC")
+          .split(/[<].*?[>]/);
+      return parsed.filter(p => !p.includes("read more") && p.length > 0 && p !== p.toUpperCase())
     }
   }
 }
@@ -224,5 +223,14 @@ a:not(.button):not(.navbar-item):not(.navbar-burger):not(.icon):not(.card-header
 
 a:hover {
   text-decoration: underline;
+}
+
+.icon {
+  text-rendering: optimizeLegibility !important;
+}
+
+.svg-inline--fa {
+  height: 1.25em;
+  width: 1.25em;
 }
 </style>

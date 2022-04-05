@@ -109,7 +109,7 @@ async function parseContent(url, selector) {
     const $ = cheerio.load(html);
 
     // Gather output html
-    let output = $(selector).text();
+    let output = $(selector);
     return output;
 }
 
