@@ -6,7 +6,7 @@ import cheerio from 'cheerio';
 const app = express()
 import request from 'request-promise';
 
-const port = 3000
+const port = 2096
 
 const rss_list = {
     bbc_ru: { url: 'http://feeds.bbci.co.uk/russian/rss.xml', selector: "main > div p" },
