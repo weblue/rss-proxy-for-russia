@@ -12,7 +12,8 @@ const rss_list = {
     bbc_ru: { url: 'http://feeds.bbci.co.uk/russian/rss.xml', selector: "main > div p" },
     bbc: { url: 'http://feeds.bbci.co.uk/news/world-60525350/rss.xml', selector: "main > div p" },
     ap: { url: 'https://www.pipes.digital/feed/1NjYgr9z', selector: ".Article > p"},
-    reuters: { url: 'https://www.pipes.digital/feed/1NklLJOR', selector: ".article-body__content__3VtU3 > p"}
+    reuters: { url: 'https://www.pipes.digital/feed/1NklLJOR', selector: ".article-body__content__3VtU3 > p"},
+    radio_freedom_europe: { url: 'https://www.rferl.org/api/z$gvmtet_tmt', selector: "div.accordeon__target > p"}
 }
 
 const cache = { }
