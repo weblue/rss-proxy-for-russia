@@ -1,12 +1,17 @@
-FROM node:10-alpine
+FROM node:14-alpine as build-stage
 
 WORKDIR /app
-
-COPY . .
+COPY frontend/package*.json ./
 RUN npm install
+COPY frontend/. .
+RUN npm run build
 
-EXPOSE 3000
+FROM node:14-alpine as production-stage
+WORKDIR /runner
+COPY backend/package*.json ./
+RUN npm install
+COPY backend/index.js ./
+COPY --from=build-stage /backend/dist ./dist
 
-# ENV NODE_ENV=production
-
-CMD [ "node", "index.js" ]
+EXPOSE 2096
+CMD ["node", "index.js"]
